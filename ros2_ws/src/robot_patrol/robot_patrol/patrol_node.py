@@ -18,6 +18,7 @@ class PatrolNode(Node):
         self._index = 0
         self._publisher = self.create_publisher(String, "patrol/status", 10)
         self._timer = self.create_timer(2.0, self._tick)
+        self.get_logger().info(f"loaded_waypoints={self._waypoints}")
 
     def _resolve_waypoints(self) -> List[str]:
         waypoint_file = self.get_parameter("waypoint_file").value
@@ -28,9 +29,11 @@ class PatrolNode(Node):
         return load_waypoints(str(default_file))
 
     def _tick(self) -> None:
+        target = self._waypoints[self._index]
         msg = String()
-        msg.data = f"heading_to={self._waypoints[self._index]}"
+        msg.data = f"heading_to={target}"
         self._publisher.publish(msg)
+        self.get_logger().info(f"event=patrol_transition waypoint={target} index={self._index}")
         self._index = (self._index + 1) % len(self._waypoints)
 
 
