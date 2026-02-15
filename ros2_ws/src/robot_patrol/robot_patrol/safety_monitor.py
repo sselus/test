@@ -2,11 +2,19 @@
 
 
 class DebouncedStop:
-    def __init__(self) -> None:
+    def __init__(self, threshold: int = 2) -> None:
         self._active = False
+        self._threshold = threshold
+        self._votes = 0
 
     def update(self, stop_signal: bool) -> bool:
-        self._active = stop_signal
+        if stop_signal:
+            self._votes += 1
+            if self._votes >= self._threshold:
+                self._active = True
+        else:
+            self._votes = 0
+            self._active = False
         return self._active
 
     @property
