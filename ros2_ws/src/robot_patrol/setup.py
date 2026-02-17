@@ -23,6 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "patrol_node = robot_patrol.patrol_node:main",
+            "stop_cmd = robot_patrol.stop_cmd:main",
         ],
     },
 )
