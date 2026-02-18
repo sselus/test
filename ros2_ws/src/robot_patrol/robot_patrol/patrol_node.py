@@ -7,6 +7,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Bool, String
 
+from .patrol_controller import PatrolController
 from .safety_monitor import DebouncedStop
 from .waypoint_loader import load_waypoints
 
@@ -16,7 +17,7 @@ class PatrolNode(Node):
         super().__init__("patrol_node")
         self.declare_parameter("waypoint_file", "")
         self._waypoints: List[str] = self._resolve_waypoints()
-        self._index = 0
+        self._controller = PatrolController(self._waypoints)
         self._safety = DebouncedStop()
         self._publisher = self.create_publisher(String, "patrol/status", 10)
         self._stop_sub = self.create_subscription(Bool, "patrol/stop", self._on_stop, 10)
@@ -40,12 +41,12 @@ class PatrolNode(Node):
             self.get_logger().warning("event=patrol_paused reason=emergency_stop")
             return
 
-        target = self._waypoints[self._index]
+        target = self._controller.current_target()
         msg = String()
         msg.data = f"heading_to={target}"
         self._publisher.publish(msg)
-        self.get_logger().info(f"event=patrol_transition waypoint={target} index={self._index}")
-        self._index = (self._index + 1) % len(self._waypoints)
+        self.get_logger().info(f"event=patrol_transition waypoint={target}")
+        self._controller.advance()
 
 
 def main() -> None:
