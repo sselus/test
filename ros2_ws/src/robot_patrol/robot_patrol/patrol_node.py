@@ -45,8 +45,10 @@ class PatrolNode(Node):
         msg = String()
         msg.data = f"heading_to={target}"
         self._publisher.publish(msg)
-        self.get_logger().info(f"event=patrol_transition waypoint={target}")
         self._controller.advance()
+        self.get_logger().info(
+            f"event=patrol_transition waypoint={target} total={self._controller.metrics.transitions}"
+        )
 
 
 def main() -> None:
