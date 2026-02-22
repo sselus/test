@@ -15,6 +15,9 @@ class PatrolController:
         self._index = 0
         self.metrics = PatrolMetrics()
 
+    def has_targets(self) -> bool:
+        return bool(self._waypoints)
+
     def current_target(self) -> str:
         return self._waypoints[self._index]
 

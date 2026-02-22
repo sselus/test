@@ -41,6 +41,10 @@ class PatrolNode(Node):
             self.get_logger().warning("event=patrol_paused reason=emergency_stop")
             return
 
+        if not self._controller.has_targets():
+            self.get_logger().error("event=patrol_paused reason=no_waypoints")
+            return
+
         target = self._controller.current_target()
         msg = String()
         msg.data = f"heading_to={target}"
